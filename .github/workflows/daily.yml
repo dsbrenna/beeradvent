@@ -47,6 +47,7 @@ jobs:
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           BEERS_URL: ${{ secrets.BEERS_URL }}
+          BEER_ORDER: listed  # the list is already in the chosen order, line 1 = Dec 1
           INPUT_DATE: ${{ inputs.date }}
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
           INPUT_TEST_MESSAGE: ${{ inputs.test_message }}
@@ -62,6 +63,7 @@ jobs:
         if: always()
         env:
           BEERS_URL: ${{ secrets.BEERS_URL }}
+          BEER_ORDER: listed  # the list is already in the chosen order, line 1 = Dec 1
           INPUT_DATE: ${{ inputs.date }}
         run: |
           set -euo pipefail

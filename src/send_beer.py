@@ -5,7 +5,8 @@ Usage:
     BEERS_URL=beers.example.txt NTFY_TOPIC=mytopic python3 src/send_beer.py [--dry-run]
         [--date YYYY-MM-DD] [--show-schedule] [--test-message]
 
-Env: NTFY_TOPIC, BEERS_URL (required); NTFY_SERVER, SEED (optional).
+Env: NTFY_TOPIC, BEERS_URL (required); NTFY_SERVER, SEED, BEER_ORDER (optional).
+BEER_ORDER=listed uses the list order as given (line 1 = Dec 1) instead of shuffling.
 """
 
 import argparse
@@ -79,7 +80,10 @@ def load_beers(source):
 def permutation(seed):
     """Permutation of row indices 0..23. Day N gets row perm[N-1]."""
     perm = list(range(DAYS))
-    random.Random(seed).shuffle(perm)
+    # BEER_ORDER=listed means the list is already in the wanted order
+    # (line 1 is Dec 1), so no shuffle is applied.
+    if os.environ.get("BEER_ORDER", "shuffle").strip().lower() != "listed":
+        random.Random(seed).shuffle(perm)
     return perm
 
 

@@ -22,8 +22,9 @@ One scheduled GitHub Action (`.github/workflows/daily.yml`, 23:00 UTC daily):
 
 The full list is NOT in this repo. It lives at a private URL stored in the
 `BEERS_URL` repository secret, so nobody can peek ahead from the public code or
-site. The shuffle is seeded by the year and keyed on line position: rewording a
-line keeps its day, but adding, removing, or reordering lines changes the days.
+site. The daily job runs with `BEER_ORDER=listed`, so the list is used in the
+order given: line 1 is Dec 1, line 24 is Dec 24. Without that setting the list
+is shuffled with a seed based on the year.
 
 ## Editing the beer list
 

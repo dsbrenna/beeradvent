@@ -9,7 +9,8 @@
 - **One public repo, list kept outside it.** The owner's GitHub plan cannot serve Pages from a private repo, and a cross-repo deploy key was not wanted. So code and site are public, and the list lives at a private URL in the `BEERS_URL` secret.
 - **One day ahead.** `LEAD_DAYS = 1` in `send_beer.py`: the 5pm run on date X reveals and announces the beer for X+1, so people can buy it the day before. Both scripts and the page's door times follow this one rule.
 - **Publish only reached days.** `publish.py` regenerates `revealed.json` in full each run from the list, seed, and date, so a missed day self-heals and unrevealed beers never reach the public site. A test asserts no hidden name appears in the output.
-- **Shuffle keyed on line position, seeded by year.** Editing a beer's text keeps its day. Changing the number or order of lines reshuffles.
+- **Order comes from the list (2026-11-13).** The group randomized the order themselves, so the workflow sets `BEER_ORDER=listed` and line N is Dec N. The owner does not want to see the order again before the reveals: never print, echo, or summarize the list, and never run `--show-schedule`.
+- **Shuffle (when BEER_ORDER is not `listed`) keyed on line position, seeded by year.** Editing a beer's text keeps its day. Changing the number or order of lines reshuffles.
 - **Pages deployed by Actions artifact** (`upload-pages-artifact` + `deploy-pages`), so no generated files are committed and no extra credentials exist.
 - **No service worker.** Cached data would show stale doors; Add to Home Screen works without one.
 - **Site renders only from `revealed.json`.** The page never decides on its own that a door is open.

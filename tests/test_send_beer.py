@@ -60,6 +60,12 @@ class ParseTests(unittest.TestCase):
 
 
 class ShuffleTests(unittest.TestCase):
+    def test_listed_order_skips_shuffle(self):
+        with mock.patch.dict(os.environ, {"BEER_ORDER": "listed"}):
+            self.assertEqual(send_beer.permutation(2026), list(range(24)))
+            self.assertEqual(send_beer.beer_for_day(BEERS, 1, 2026), BEERS[0])
+            self.assertEqual(send_beer.beer_for_day(BEERS, 24, 2026), BEERS[23])
+
     def test_is_true_permutation(self):
         perm = send_beer.permutation(2026)
         self.assertEqual(sorted(perm), list(range(24)))
