@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beer Advent 2026</title>
+<meta name="description" content="A beer advent calendar: one new beer each day, Dec 1 to 24.">
+<meta name="theme-color" content="#7a121c">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Beer Advent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+  :root {
+    --bg: #1a0b0e;
+    --bg2: #2a1015;
+    --red: #7a121c;
+    --red2: #a3202c;
+    --gold: #f5b126;
+    --gold2: #ffd666;
+    --cream: #fff6e6;
+    --muted: #d9c3b0;
+    --green: #1f5a3a;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--cream);
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(163, 32, 44, .55), transparent 70%),
+      radial-gradient(800px 500px at 100% 100%, rgba(31, 90, 58, .35), transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+    padding:
+      calc(env(safe-area-inset-top) + 16px)
+      calc(env(safe-area-inset-right) + 16px)
+      calc(env(safe-area-inset-bottom) + 24px)
+      calc(env(safe-area-inset-left) + 16px);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin: 4px 0 16px; }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+    letter-spacing: .02em;
+    color: var(--gold2);
+    text-shadow: 0 2px 0 rgba(0,0,0,.35);
+  }
+  h1 .mug { display: inline-block; transform: translateY(-2px); }
+  .sub { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    padding: 22px 20px;
+    margin-bottom: 14px;
+    background: linear-gradient(145deg, var(--red2), var(--red) 60%, #4d0b12);
+    border: 2px solid rgba(255, 214, 102, .55);
+    box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: ""; position: absolute; width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,214,102,.25), transparent 70%);
+  }
+  .hero::before { top: -60px; left: -50px; }
+  .hero::after { bottom: -70px; right: -40px; }
+  .hero .label {
+    text-transform: uppercase; letter-spacing: .14em; font-size: .78rem;
+    color: var(--gold2); font-weight: 700;
+  }
+  .hero .beer {
+    margin: 8px 0 4px;
+    font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    word-wrap: break-word;
+  }
+  .hero .dayline { color: var(--muted); font-size: .95rem; }
+
+  .status {
+    text-align: center;
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: .98rem;
+    color: var(--cream);
+  }
+  .status strong { color: var(--gold2); font-variant-numeric: tabular-nums; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  @media (min-width: 560px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+  .door {
+    position: relative;
+    min-height: 84px;
+    aspect-ratio: 1 / 1.08;
+    border-radius: var(--radius);
+    border: 0;
+    padding: 8px 6px;
+    font: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .door .num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+  .door .name {
+    margin-top: 6px;
+    font-size: .74rem;
+    line-height: 1.15;
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+  .door.locked {
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 8px, transparent 8px 16px),
+      linear-gradient(160deg, #3a151b, #251014);
+    border: 1px dashed rgba(255,255,255,.18);
+    color: rgba(255,246,230,.55);
+  }
+  .door.locked .lock { font-size: .9rem; margin-top: 6px; opacity: .7; }
+  .door.open {
+    cursor: pointer;
+    background: linear-gradient(160deg, #2f6b48, var(--green));
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: 0 4px 12px rgba(0,0,0,.35);
+  }
+  .door.open .num { color: var(--gold2); font-size: 1.15rem; }
+  .door.today {
+    background: linear-gradient(160deg, var(--gold2), var(--gold));
+    color: #3a1a05;
+    border: 2px solid var(--cream);
+    box-shadow: 0 0 0 3px rgba(255,214,102,.35), 0 6px 18px rgba(0,0,0,.45);
+  }
+  .door.today .num { color: #7a121c; }
+  .door.open:active { transform: scale(.97); }
+  .door:focus-visible { outline: 3px solid var(--gold2); outline-offset: 2px; }
+
+  .hint {
+    margin-top: 18px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: .88rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .hint strong { color: var(--cream); }
+  .hint p { margin: 4px 0; }
+  footer { text-align: center; margin-top: 18px; font-size: .78rem; color: rgba(217,195,176,.6); }
+
+  dialog {
+    border: 2px solid rgba(255,214,102,.6);
+    border-radius: 22px;
+    padding: 26px 22px 20px;
+    width: min(92vw, 420px);
+    background: linear-gradient(160deg, var(--red2), var(--red));
+    color: var(--cream);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  dialog::backdrop { background: rgba(10, 3, 5, .7); }
+  dialog .num { color: var(--gold2); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .85rem; }
+  dialog .beer { font-size: 1.8rem; font-weight: 800; margin: 10px 0 18px; line-height: 1.15; word-wrap: break-word; }
+  dialog button {
+    font: inherit; font-weight: 700; min-height: 48px; padding: 10px 28px;
+    border-radius: 999px; border: 0; background: var(--gold2); color: #3a1a05;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="mug" aria-hidden="true">&#127866;</span> Beer Advent 2026</h1>
+    <p class="sub">One new beer every day, December 1 to 24</p>
+  </header>
+
+  <section class="hero" id="hero" aria-live="polite">
+    <div class="label" id="hero-label">Loading</div>
+    <div class="beer" id="hero-beer">Pouring...</div>
+    <div class="dayline" id="hero-day"></div>
+  </section>
+
+  <p class="status" id="status" aria-live="polite">&nbsp;</p>
+
+  <main class="grid" id="grid" aria-label="Advent calendar doors"></main>
+
+  <section class="hint hidden" id="hint">
+    <p><strong>Put this on your home screen</strong></p>
+    <p id="hint-ios">iPhone (Safari): tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</p>
+    <p id="hint-android">Android (Chrome): tap the <strong>&#8942; menu</strong>, then <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+  </section>
+
+  <footer>A new door opens at 5:00 pm Central each day. Drink responsibly.</footer>
+</div>
+
+<dialog id="dlg">
+  <div class="num" id="dlg-num"></div>
+  <div class="beer" id="dlg-beer"></div>
+  <form method="dialog"><button>Cheers</button></form>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  var YEAR = 2026;
+  var DAYS = 24;
+  // Doors open at 5:00 pm America/Chicago. December is always CST (UTC-6),
+  // so that is 23:00 UTC on Dec N, which is correct for viewers in any zone.
+  function openAt(day) { return new Date(Date.UTC(YEAR, 11, day, 23, 0, 0)); }
+
+  var grid = document.getElementById("grid");
+  var statusEl = document.getElementById("status");
+  var heroLabel = document.getElementById("hero-label");
+  var heroBeer = document.getElementById("hero-beer");
+  var heroDay = document.getElementById("hero-day");
+  var dlg = document.getElementById("dlg");
+
+  var revealed = {};   // day -> beer, only from revealed.json
+  var latest = 0;
+  var loaded = false;
+  var failed = false;
+
+  function localTime(d) {
+    return d.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+
+  function countdown(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var d = Math.floor(s / 86400); s -= d * 86400;
+    var h = Math.floor(s / 3600); s -= h * 3600;
+    var m = Math.floor(s / 60); s -= m * 60;
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return (d > 0 ? d + "d " : "") + p(h) + "h " + p(m) + "m " + p(s) + "s";
+  }
+
+  function showDoor(day) {
+    if (!revealed[day]) return;
+    document.getElementById("dlg-num").textContent = "Day " + day;
+    document.getElementById("dlg-beer").textContent = revealed[day];
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else alert("Day " + day + ": " + revealed[day]);
+  }
+
+  function renderGrid() {
+    grid.textContent = "";
+    for (var day = 1; day <= DAYS; day++) {
+      var beer = revealed[day];
+      var el = document.createElement(beer ? "button" : "div");
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = day;
+      el.appendChild(num);
+      if (beer) {
+        el.type = "button";
+        el.className = "door open" + (day === latest ? " today" : "");
+        el.setAttribute("aria-label", "Day " + day + ": " + beer);
+        var name = document.createElement("span");
+        name.className = "name";
+        name.textContent = beer;
+        el.appendChild(name);
+        el.addEventListener("click", showDoor.bind(null, day));
+      } else {
+        el.className = "door locked";
+        el.setAttribute("aria-label", "Day " + day + ", locked");
+        var lock = document.createElement("span");
+        lock.className = "lock";
+        lock.setAttribute("aria-hidden", "true");
+        lock.textContent = "🔒";
+        el.appendChild(lock);
+      }
+      grid.appendChild(el);
+    }
+  }
+
+  function renderHero() {
+    if (failed && !loaded) {
+      heroLabel.textContent = "Hmm";
+      heroBeer.textContent = "Could not load the calendar";
+      heroDay.textContent = "Check your connection and pull to refresh.";
+    } else if (!loaded) {
+      return;
+    } else if (latest > 0) {
+      heroLabel.textContent = latest === DAYS ? "The final beer" : "Today's beer";
+      heroBeer.textContent = revealed[latest];
+      heroDay.textContent = "Day " + latest + " of " + DAYS;
+    } else if (new Date() >= openAt(DAYS)) {
+      heroLabel.textContent = "That's a wrap";
+      heroBeer.textContent = "Beer Advent " + YEAR + " is over";
+      heroDay.textContent = "Thanks for drinking along. See you next December.";
+    } else {
+      heroLabel.textContent = "Coming soon";
+      heroBeer.textContent = "All doors are still shut";
+      heroDay.textContent = "The first beer is revealed December 1 at 5:00 pm Central.";
+    }
+  }
+
+  function renderStatus() {
+    var now = new Date();
+    if (failed && !loaded) { statusEl.textContent = "Calendar unavailable right now. We will retry automatically."; return; }
+    if (!loaded) return;
+    if (latest >= DAYS || now >= openAt(DAYS + 1)) {
+      statusEl.textContent = "All 24 doors are open. Cheers, and happy holidays!";
+      return;
+    }
+    var next = latest + 1;
+    var at = openAt(next);
+    var ms = at - now;
+    statusEl.textContent = "";
+    if (ms <= 0) {
+      statusEl.appendChild(document.createTextNode("Door " + next + " is being poured. Check back in a few minutes."));
+      return;
+    }
+    var lead = next === 1 ? "First door opens in " : "Door " + next + " opens in ";
+    statusEl.appendChild(document.createTextNode(lead));
+    var b = document.createElement("strong");
+    b.textContent = countdown(ms);
+    statusEl.appendChild(b);
+    statusEl.appendChild(document.createTextNode(" (" + localTime(at) + " your time, 5:00 pm Central)"));
+  }
+
+  function render() { renderHero(); renderGrid(); renderStatus(); }
+
+  function load() {
+    var url = "revealed.json?t=" + Date.now();
+    return fetch(url, { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var next = {};
+        var max = 0;
+        var days = (data && Array.isArray(data.days)) ? data.days : [];
+        days.forEach(function (d) {
+          var n = Number(d && d.day);
+          if (n >= 1 && n <= DAYS && typeof d.beer === "string" && d.beer) {
+            next[n] = d.beer;
+            if (n > max) max = n;
+          }
+        });
+        revealed = next;
+        latest = max;
+        loaded = true;
+        failed = false;
+        render();
+      })
+      .catch(function () {
+        failed = true;
+        render();
+      });
+  }
+
+  // Tick the countdown; refetch when a door's time passes and while waiting on the publish.
+  var lastFetch = 0;
+  setInterval(function () {
+    renderStatus();
+    var now = Date.now();
+    var waiting = loaded && latest < DAYS && now >= openAt(latest + 1).getTime();
+    if ((waiting || (failed && !loaded)) && now - lastFetch > 60000) { lastFetch = now; load(); }
+  }, 1000);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") { lastFetch = Date.now(); load(); }
+  });
+
+  // Add to Home Screen hint, hidden when already installed.
+  var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+  if (!standalone) {
+    var ua = navigator.userAgent || "";
+    var ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    if (ios) document.getElementById("hint-android").classList.add("hidden");
+    if (android) document.getElementById("hint-ios").classList.add("hidden");
+    document.getElementById("hint").classList.remove("hidden");
+  }
+
+  renderGrid();
+  lastFetch = Date.now();
+  load();
+})();
+</script>
+</body>
+</html>

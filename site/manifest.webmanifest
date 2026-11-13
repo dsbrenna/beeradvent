@@ -1,0 +1,16 @@
+{
+  "name": "Beer Advent",
+  "short_name": "Beer Advent",
+  "description": "A beer advent calendar: one new beer each day, Dec 1 to 24.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#7a121c",
+  "background_color": "#1a0b0e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,84 @@
+name: Beer Advent daily
+
+on:
+  schedule:
+    # 23:00 UTC = 5pm Central Standard Time in December.
+    # To change the hour, edit the second field (UTC hour), e.g. "0 14 * * *" = 8am CST.
+    # Runs every day of the year; the scripts no-op outside Dec 1 to 24.
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Target date YYYY-MM-DD (blank = today in America/Chicago). Publicly reveals beers up to that date."
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (print only, do not send or publish)"
+        type: boolean
+        default: false
+      test_message:
+        description: "Send a test notification regardless of date"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Send today's beer
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          BEERS_URL: ${{ secrets.BEERS_URL }}
+          INPUT_DATE: ${{ inputs.date }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_TEST_MESSAGE: ${{ inputs.test_message }}
+        run: |
+          args=()
+          if [ -n "$INPUT_DATE" ]; then args+=(--date "$INPUT_DATE"); fi
+          if [ "$INPUT_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          if [ "$INPUT_TEST_MESSAGE" = "true" ]; then args+=(--test-message); fi
+          python src/send_beer.py "${args[@]}"
+
+      - name: Build site with only the revealed beers
+        # Runs even if the send step failed, so the site still updates.
+        if: always()
+        env:
+          BEERS_URL: ${{ secrets.BEERS_URL }}
+          INPUT_DATE: ${{ inputs.date }}
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp -R site/. _site/
+          args=(--out _site)
+          if [ -n "$INPUT_DATE" ]; then args+=(--date "$INPUT_DATE"); fi
+          python src/publish.py "${args[@]}"
+          : > _site/.nojekyll
+          ls -1 _site
+
+      - name: Upload site
+        if: ${{ always() && !inputs.dry_run }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        if: ${{ always() && !inputs.dry_run }}
+        uses: actions/deploy-pages@v4
