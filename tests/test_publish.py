@@ -7,7 +7,7 @@ import os
 import sys
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from unittest import mock
 
@@ -43,14 +43,16 @@ class PublishTests(unittest.TestCase):
 
     def test_reveal_counts(self):
         cases = {
-            "2026-11-30": 0, "2026-12-01": 1, "2026-12-10": 10, "2026-12-24": 24,
-            "2026-12-25": 24, "2026-12-31": 24, "2027-01-15": 0,
+            # One day ahead: the Nov 30 run reveals Dec 1, the Dec 23 run reveals Dec 24.
+            "2026-11-29": 0, "2026-11-30": 1, "2026-12-01": 2, "2026-12-10": 11,
+            "2026-12-23": 24, "2026-12-24": 24, "2026-12-30": 24,
+            "2026-12-31": 0, "2027-01-15": 0,
         }
         for d, n in cases.items():
             with self.subTest(date=d):
                 _, data = self.publish(d)
                 self.assertEqual([x["day"] for x in data["days"]], list(range(1, n + 1)))
-                self.assertEqual(data["year"], date.fromisoformat(d).year)
+                self.assertEqual(data["year"], (date.fromisoformat(d) + timedelta(days=1)).year)
                 self.assertIn("updated", data)
 
     def test_revealed_beers_match_send_beer(self):
@@ -61,15 +63,15 @@ class PublishTests(unittest.TestCase):
                     out = io.StringIO()
                     with contextlib.redirect_stdout(out), \
                             mock.patch.dict(os.environ, {"NTFY_TOPIC": "x"}):
-                        code = send_beer.main(["--date", f"2026-12-{entry['day']:02d}", "--dry-run"])
+                        code = send_beer.main(["--date", (date(2026, 12, entry["day"]) - timedelta(days=1)).isoformat(), "--dry-run"])
                     self.assertEqual(code, 0)
-                    self.assertIn(f"Today's beer: {entry['beer']}", out.getvalue())
+                    self.assertIn(f"Tomorrow's beer (Dec {entry['day']}): {entry['beer']}", out.getvalue())
 
     def test_no_peek_mid_month(self):
         text, data = self.publish("2026-12-10")
         revealed = {x["beer"] for x in data["days"]}
         hidden = [b for b in BEERS if b not in revealed]
-        self.assertEqual(len(hidden), 14)
+        self.assertEqual(len(hidden), 13)  # Dec 10 run reveals days 1 to 11
         for beer in hidden:
             self.assertNotIn(beer, text)
         self.assertEqual(set(data.keys()), {"year", "updated", "days"})

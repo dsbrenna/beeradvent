@@ -1,6 +1,6 @@
 # TODO
 
-Walking skeleton: one daily job reads the list, sends today's beer to ntfy, and publishes the revealed days to the web app.
+Walking skeleton: one daily job reads the list, sends tomorrow's beer to ntfy, and publishes the revealed days to the web app.
 
 ## Open
 
@@ -11,4 +11,4 @@ Walking skeleton: one daily job reads the list, sends today's beer to ntfy, and 
 ## Parked (needs owner decision)
 
 - Stage 2: in-app push alerts from the web app.
-- Keep all 24 beers visible after December instead of emptying in January.
+- Keep all 24 beers visible after December instead of emptying on Dec 31.

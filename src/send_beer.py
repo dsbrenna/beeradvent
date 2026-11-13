@@ -17,10 +17,13 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 DAYS = 24
+# Each beer is revealed this many days before the day it is for, so the 5pm run
+# on Nov 30 announces the Dec 1 beer and the run on Dec 23 announces Dec 24.
+LEAD_DAYS = 1
 DEFAULT_SERVER = "https://ntfy.sh"
 TIMEZONE = "America/Chicago"
 TIMEOUT = 20
@@ -99,6 +102,11 @@ def advent_day(target):
     return None
 
 
+def reveal_date(run_date):
+    """The calendar date whose beer is revealed by the run on run_date."""
+    return run_date + timedelta(days=LEAD_DAYS)
+
+
 def today_chicago():
     return datetime.now(ZoneInfo(TIMEZONE)).date()
 
@@ -160,7 +168,8 @@ def run(argv=None):
         deliver("Beer Advent test", TEST_BODY, args.dry_run)
         return 0
 
-    target = args.date or today_chicago()
+    run_date = args.date or today_chicago()
+    target = reveal_date(run_date)
     seed = resolve_seed(target)
 
     if args.show_schedule:
@@ -173,12 +182,12 @@ def run(argv=None):
 
     day = advent_day(target)
     if day is None:
-        print(f"{target.isoformat()}: nothing to send (outside Dec 1 to 24)")
+        print(f"{run_date.isoformat()}: nothing to send (next day {target.isoformat()} is outside Dec 1 to 24)")
         return 0
 
     beers = load_beers(require_env("BEERS_URL"))
     beer = beer_for_day(beers, day, seed)
-    deliver(f"Beer Advent Day {day}", f"Today's beer: {beer}", args.dry_run)
+    deliver(f"Beer Advent Day {day}", f"Tomorrow's beer (Dec {day}): {beer}", args.dry_run)
     return 0
 
 

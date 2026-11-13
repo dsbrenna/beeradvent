@@ -23,6 +23,7 @@ from send_beer import (
     parse_date,
     require_env,
     resolve_seed,
+    reveal_date,
     today_chicago,
 )
 
@@ -60,14 +61,16 @@ def run(argv=None):
     parser.add_argument("--date", type=parse_date, help="target date YYYY-MM-DD (default: today in Chicago)")
     args = parser.parse_args(argv)
 
-    target = args.date or today_chicago()
+    run_date = args.date or today_chicago()
+    # Beers are revealed LEAD_DAYS ahead, so reveal as if it were already that day.
+    target = reveal_date(run_date)
     count = revealed_count(target)
     # Validate the list (exactly 24) even when nothing is revealed, so a broken
     # list fails loudly in November instead of on Dec 1.
     beers = load_beers(require_env("BEERS_URL"))
     payload = build_payload(beers, target, resolve_seed(target))
     path = write_revealed(args.out, payload)
-    print(f"{target.isoformat()}: wrote {path} with {count} revealed day(s)")
+    print(f"{run_date.isoformat()}: wrote {path} with {count} revealed day(s)")
     return 0
 
 

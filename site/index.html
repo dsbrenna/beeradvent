@@ -4,29 +4,41 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Beer Advent 2026</title>
-<meta name="description" content="A beer advent calendar: one new beer each day, Dec 1 to 24.">
-<meta name="theme-color" content="#7a121c">
-<meta name="color-scheme" content="dark">
+<meta name="description" content="A beer advent calendar: one beer for each day, Dec 1 to 24.">
+<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151413" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Beer Advent">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
   :root {
-    --bg: #1a0b0e;
-    --bg2: #2a1015;
-    --red: #7a121c;
-    --red2: #a3202c;
-    --gold: #f5b126;
-    --gold2: #ffd666;
-    --cream: #fff6e6;
-    --muted: #d9c3b0;
-    --green: #1f5a3a;
-    --radius: 16px;
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --text: #1c1a17;
+    --muted: #6b665f;
+    --faint: #a29d95;
+    --line: #e2dfd9;
+    --accent: #a8430f;
+    --on-accent: #ffffff;
+    --radius: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413;
+      --surface: #1f1d1b;
+      --text: #ece9e4;
+      --muted: #a09a92;
+      --faint: #6a655e;
+      --line: #34312d;
+      --accent: #e8955a;
+      --on-accent: #1a1208;
+    }
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -35,162 +47,104 @@
     min-height: 100vh;
     min-height: 100dvh;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: var(--cream);
-    background:
-      radial-gradient(1200px 600px at 50% -200px, rgba(163, 32, 44, .55), transparent 70%),
-      radial-gradient(800px 500px at 100% 100%, rgba(31, 90, 58, .35), transparent 70%),
-      var(--bg);
-    background-attachment: fixed;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg);
     padding:
-      calc(env(safe-area-inset-top) + 16px)
+      calc(env(safe-area-inset-top) + 24px)
       calc(env(safe-area-inset-right) + 16px)
-      calc(env(safe-area-inset-bottom) + 24px)
+      calc(env(safe-area-inset-bottom) + 32px)
       calc(env(safe-area-inset-left) + 16px);
   }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  header { text-align: center; margin: 4px 0 16px; }
-  h1 {
-    margin: 0;
-    font-size: clamp(1.8rem, 7vw, 2.6rem);
-    letter-spacing: .02em;
-    color: var(--gold2);
-    text-shadow: 0 2px 0 rgba(0,0,0,.35);
-  }
-  h1 .mug { display: inline-block; transform: translateY(-2px); }
-  .sub { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  header { margin-bottom: 24px; }
+  h1 { margin: 0; font-size: 1.5rem; font-weight: 650; line-height: 1.2; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: .95rem; }
 
   .hero {
-    position: relative;
-    overflow: hidden;
-    border-radius: 22px;
-    padding: 22px 20px;
-    margin-bottom: 14px;
-    background: linear-gradient(145deg, var(--red2), var(--red) 60%, #4d0b12);
-    border: 2px solid rgba(255, 214, 102, .55);
-    box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
-    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
   }
-  .hero::before, .hero::after {
-    content: ""; position: absolute; width: 140px; height: 140px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,214,102,.25), transparent 70%);
+  .entry + .entry { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .entry .label { font-size: .85rem; color: var(--muted); }
+  .entry.key .label { color: var(--accent); font-weight: 600; }
+  .entry .beer {
+    margin-top: 2px;
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
   }
-  .hero::before { top: -60px; left: -50px; }
-  .hero::after { bottom: -70px; right: -40px; }
-  .hero .label {
-    text-transform: uppercase; letter-spacing: .14em; font-size: .78rem;
-    color: var(--gold2); font-weight: 700;
-  }
-  .hero .beer {
-    margin: 8px 0 4px;
-    font-size: clamp(1.5rem, 6.5vw, 2.2rem);
-    font-weight: 800;
-    line-height: 1.15;
-    word-wrap: break-word;
-  }
-  .hero .dayline { color: var(--muted); font-size: .95rem; }
+  .entry.minor .beer { font-size: 1.05rem; font-weight: 500; }
+  .entry .note { margin-top: 2px; color: var(--muted); font-size: .95rem; }
 
-  .status {
-    text-align: center;
-    margin: 0 0 16px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.1);
-    font-size: .98rem;
-    color: var(--cream);
-  }
-  .status strong { color: var(--gold2); font-variant-numeric: tabular-nums; }
+  .status { margin: 0 0 24px; color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
   }
   @media (min-width: 560px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
   .door {
-    position: relative;
-    min-height: 84px;
-    aspect-ratio: 1 / 1.08;
+    min-height: 76px;
     border-radius: var(--radius);
-    border: 0;
-    padding: 8px 6px;
+    border: 1px solid var(--line);
+    background: transparent;
+    padding: 8px;
     font: inherit;
     color: inherit;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
     -webkit-tap-highlight-color: transparent;
   }
-  .door .num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+  .door .num { font-size: .95rem; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
   .door .name {
-    margin-top: 6px;
-    font-size: .74rem;
-    line-height: 1.15;
-    font-weight: 600;
+    margin-top: 4px;
+    font-size: .75rem;
+    line-height: 1.25;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    word-break: break-word;
+    overflow-wrap: anywhere;
   }
-  .door.locked {
-    background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 8px, transparent 8px 16px),
-      linear-gradient(160deg, #3a151b, #251014);
-    border: 1px dashed rgba(255,255,255,.18);
-    color: rgba(255,246,230,.55);
-  }
-  .door.locked .lock { font-size: .9rem; margin-top: 6px; opacity: .7; }
-  .door.open {
-    cursor: pointer;
-    background: linear-gradient(160deg, #2f6b48, var(--green));
-    border: 1px solid rgba(255,255,255,.18);
-    box-shadow: 0 4px 12px rgba(0,0,0,.35);
-  }
-  .door.open .num { color: var(--gold2); font-size: 1.15rem; }
-  .door.today {
-    background: linear-gradient(160deg, var(--gold2), var(--gold));
-    color: #3a1a05;
-    border: 2px solid var(--cream);
-    box-shadow: 0 0 0 3px rgba(255,214,102,.35), 0 6px 18px rgba(0,0,0,.45);
-  }
-  .door.today .num { color: #7a121c; }
-  .door.open:active { transform: scale(.97); }
-  .door:focus-visible { outline: 3px solid var(--gold2); outline-offset: 2px; }
+  .door.locked { color: var(--faint); }
+  .door.open { cursor: pointer; background: var(--surface); }
+  .door.next { border-color: var(--accent); }
+  .door.next .num { color: var(--accent); }
+  .door.today { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .door.open:active { opacity: .8; }
+  .door:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .hint {
-    margin-top: 18px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.1);
-    font-size: .88rem;
-    color: var(--muted);
-    line-height: 1.45;
-  }
-  .hint strong { color: var(--cream); }
-  .hint p { margin: 4px 0; }
-  footer { text-align: center; margin-top: 18px; font-size: .78rem; color: rgba(217,195,176,.6); }
+  .hint { margin-top: 24px; font-size: .85rem; color: var(--muted); }
+  .hint p { margin: 0; }
+  footer { margin-top: 12px; font-size: .85rem; color: var(--muted); }
 
   dialog {
-    border: 2px solid rgba(255,214,102,.6);
-    border-radius: 22px;
-    padding: 26px 22px 20px;
-    width: min(92vw, 420px);
-    background: linear-gradient(160deg, var(--red2), var(--red));
-    color: var(--cream);
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    width: min(92vw, 400px);
+    background: var(--surface);
+    color: var(--text);
   }
-  dialog::backdrop { background: rgba(10, 3, 5, .7); }
-  dialog .num { color: var(--gold2); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .85rem; }
-  dialog .beer { font-size: 1.8rem; font-weight: 800; margin: 10px 0 18px; line-height: 1.15; word-wrap: break-word; }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog .num { color: var(--muted); font-size: .9rem; }
+  dialog .beer { font-size: 1.5rem; font-weight: 600; margin: 4px 0 20px; line-height: 1.25; overflow-wrap: anywhere; }
+  dialog form { text-align: right; }
   dialog button {
-    font: inherit; font-weight: 700; min-height: 48px; padding: 10px 28px;
-    border-radius: 999px; border: 0; background: var(--gold2); color: #3a1a05;
+    font: inherit; font-weight: 500; min-height: 44px; padding: 8px 20px;
+    border-radius: var(--radius); border: 1px solid var(--line);
+    background: var(--bg); color: var(--text);
   }
   .hidden { display: none !important; }
 </style>
@@ -198,33 +152,30 @@
 <body>
 <div class="wrap">
   <header>
-    <h1><span class="mug" aria-hidden="true">&#127866;</span> Beer Advent 2026</h1>
-    <p class="sub">One new beer every day, December 1 to 24</p>
+    <h1>Beer Advent 2026</h1>
+    <p class="sub">One beer for each day, December 1 to 24.</p>
   </header>
 
   <section class="hero" id="hero" aria-live="polite">
-    <div class="label" id="hero-label">Loading</div>
-    <div class="beer" id="hero-beer">Pouring...</div>
-    <div class="dayline" id="hero-day"></div>
+    <div class="entry"><div class="note">Loading</div></div>
   </section>
 
   <p class="status" id="status" aria-live="polite">&nbsp;</p>
 
-  <main class="grid" id="grid" aria-label="Advent calendar doors"></main>
+  <main class="grid" id="grid" aria-label="Calendar doors"></main>
+
+  <footer>Each beer is revealed at 5:00 pm Central the day before.</footer>
 
   <section class="hint hidden" id="hint">
-    <p><strong>Put this on your home screen</strong></p>
-    <p id="hint-ios">iPhone (Safari): tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</p>
-    <p id="hint-android">Android (Chrome): tap the <strong>&#8942; menu</strong>, then <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+    <p id="hint-ios">To add this to your home screen on iPhone, open it in Safari, tap Share, then Add to Home Screen.</p>
+    <p id="hint-android">To add this to your home screen on Android, open the Chrome menu, then tap Add to Home screen.</p>
   </section>
-
-  <footer>A new door opens at 5:00 pm Central each day. Drink responsibly.</footer>
 </div>
 
 <dialog id="dlg">
   <div class="num" id="dlg-num"></div>
   <div class="beer" id="dlg-beer"></div>
-  <form method="dialog"><button>Cheers</button></form>
+  <form method="dialog"><button>Close</button></form>
 </dialog>
 
 <script>
@@ -232,44 +183,62 @@
   "use strict";
   var YEAR = 2026;
   var DAYS = 24;
-  // Doors open at 5:00 pm America/Chicago. December is always CST (UTC-6),
-  // so that is 23:00 UTC on Dec N, which is correct for viewers in any zone.
-  function openAt(day) { return new Date(Date.UTC(YEAR, 11, day, 23, 0, 0)); }
+  var HOUR = 3600000;
+  var DAY_MS = 86400000;
+
+  // Door N (the beer for Dec N) opens at 5:00 pm Central on Dec N-1.
+  // Late November and December are CST (UTC-6), so that is 23:00 UTC on Dec N-1.
+  // Date.UTC rolls Dec 0 back to Nov 30 for door 1.
+  function openAt(day) { return new Date(Date.UTC(YEAR, 11, day - 1, 23, 0, 0)); }
+
+  // Optional ?now=ISO-time overrides the clock for previews. It only affects
+  // labels and countdowns; which doors are open still comes from revealed.json.
+  var clockOffset = 0;
+  try {
+    var q = new URLSearchParams(window.location.search).get("now");
+    if (q) {
+      var t = Date.parse(q);
+      if (!isNaN(t)) clockOffset = t - Date.now();
+    }
+  } catch (e) { /* ignore */ }
+  function nowMs() { return Date.now() + clockOffset; }
+
+  // December day number in Central time: Nov 30 is 0, Dec 1 is 1, Dec 25 is 25.
+  function centralDay() {
+    return Math.floor((nowMs() - 6 * HOUR - Date.UTC(YEAR, 11, 1)) / DAY_MS) + 1;
+  }
 
   var grid = document.getElementById("grid");
   var statusEl = document.getElementById("status");
-  var heroLabel = document.getElementById("hero-label");
-  var heroBeer = document.getElementById("hero-beer");
-  var heroDay = document.getElementById("hero-day");
+  var hero = document.getElementById("hero");
   var dlg = document.getElementById("dlg");
 
   var revealed = {};   // day -> beer, only from revealed.json
+  var count = 0;
   var latest = 0;
   var loaded = false;
   var failed = false;
 
-  function localTime(d) {
-    return d.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-  }
-
   function countdown(ms) {
-    var s = Math.max(0, Math.floor(ms / 1000));
-    var d = Math.floor(s / 86400); s -= d * 86400;
-    var h = Math.floor(s / 3600); s -= h * 3600;
-    var m = Math.floor(s / 60); s -= m * 60;
-    function p(n) { return (n < 10 ? "0" : "") + n; }
-    return (d > 0 ? d + "d " : "") + p(h) + "h " + p(m) + "m " + p(s) + "s";
+    var m = Math.floor(ms / 60000);
+    if (m < 1) return "less than a minute";
+    var d = Math.floor(m / 1440); m -= d * 1440;
+    var h = Math.floor(m / 60); m -= h * 60;
+    if (d > 0) return d + "d " + h + "h";
+    if (h > 0) return h + "h " + m + "m";
+    return m + "m";
   }
 
   function showDoor(day) {
     if (!revealed[day]) return;
-    document.getElementById("dlg-num").textContent = "Day " + day;
+    document.getElementById("dlg-num").textContent = "Dec " + day;
     document.getElementById("dlg-beer").textContent = revealed[day];
     if (typeof dlg.showModal === "function") dlg.showModal();
-    else alert("Day " + day + ": " + revealed[day]);
+    else alert("Dec " + day + ": " + revealed[day]);
   }
 
   function renderGrid() {
+    var today = centralDay();
     grid.textContent = "";
     for (var day = 1; day <= DAYS; day++) {
       var beer = revealed[day];
@@ -279,9 +248,13 @@
       num.textContent = day;
       el.appendChild(num);
       if (beer) {
+        var cls = "door open";
+        var when = "";
+        if (day === today) { cls += " today"; when = ", today"; }
+        else if (day === today + 1) { cls += " next"; when = ", tomorrow"; }
         el.type = "button";
-        el.className = "door open" + (day === latest ? " today" : "");
-        el.setAttribute("aria-label", "Day " + day + ": " + beer);
+        el.className = cls;
+        el.setAttribute("aria-label", "December " + day + when + ": " + beer);
         var name = document.createElement("span");
         name.className = "name";
         name.textContent = beer;
@@ -289,64 +262,72 @@
         el.addEventListener("click", showDoor.bind(null, day));
       } else {
         el.className = "door locked";
-        el.setAttribute("aria-label", "Day " + day + ", locked");
-        var lock = document.createElement("span");
-        lock.className = "lock";
-        lock.setAttribute("aria-hidden", "true");
-        lock.textContent = "🔒";
-        el.appendChild(lock);
+        el.setAttribute("aria-label", "December " + day + ", not yet revealed");
       }
       grid.appendChild(el);
     }
   }
 
+  function entry(label, beer, note, kind) {
+    var e = document.createElement("div");
+    e.className = "entry" + (kind ? " " + kind : "");
+    if (label) {
+      var l = document.createElement("div");
+      l.className = "label";
+      l.textContent = label;
+      e.appendChild(l);
+    }
+    if (beer) {
+      var b = document.createElement("div");
+      b.className = "beer";
+      b.textContent = beer;
+      e.appendChild(b);
+    }
+    if (note) {
+      var n = document.createElement("div");
+      n.className = "note";
+      n.textContent = note;
+      e.appendChild(n);
+    }
+    return e;
+  }
+
   function renderHero() {
+    var items = [];
+    var d = centralDay();
     if (failed && !loaded) {
-      heroLabel.textContent = "Hmm";
-      heroBeer.textContent = "Could not load the calendar";
-      heroDay.textContent = "Check your connection and pull to refresh.";
+      items.push(entry("", "", "Could not load the calendar. Retrying."));
     } else if (!loaded) {
       return;
-    } else if (latest > 0) {
-      heroLabel.textContent = latest === DAYS ? "The final beer" : "Today's beer";
-      heroBeer.textContent = revealed[latest];
-      heroDay.textContent = "Day " + latest + " of " + DAYS;
-    } else if (new Date() >= openAt(DAYS)) {
-      heroLabel.textContent = "That's a wrap";
-      heroBeer.textContent = "Beer Advent " + YEAR + " is over";
-      heroDay.textContent = "Thanks for drinking along. See you next December.";
+    } else if (d > DAYS) {
+      items.push(entry("", "", count >= DAYS ? "All 24 beers have been revealed." : "The calendar has ended."));
+    } else if (d >= 1) {
+      if (revealed[d]) items.push(entry("Today, Dec " + d, revealed[d], "", "key"));
+      else items.push(entry("Today, Dec " + d, "", "Updating, check back in a few minutes."));
+      if (d < DAYS && revealed[d + 1]) items.push(entry("Tomorrow, Dec " + (d + 1), revealed[d + 1], "", "minor"));
+    } else if (revealed[1]) {
+      items.push(entry(d === 0 ? "Tomorrow, Dec 1" : "Dec 1", revealed[1], "", "key"));
     } else {
-      heroLabel.textContent = "Coming soon";
-      heroBeer.textContent = "All doors are still shut";
-      heroDay.textContent = "The first beer is revealed December 1 at 5:00 pm Central.";
+      items.push(entry("", "", "The first beer is revealed Nov 30 at 5:00 pm Central."));
     }
+    hero.textContent = "";
+    items.forEach(function (el) { hero.appendChild(el); });
   }
 
   function renderStatus() {
-    var now = new Date();
-    if (failed && !loaded) { statusEl.textContent = "Calendar unavailable right now. We will retry automatically."; return; }
+    if (failed && !loaded) { statusEl.textContent = ""; return; }
     if (!loaded) return;
-    if (latest >= DAYS || now >= openAt(DAYS + 1)) {
-      statusEl.textContent = "All 24 doors are open. Cheers, and happy holidays!";
-      return;
-    }
+    if (latest >= DAYS) { statusEl.textContent = "All 24 beers have been revealed."; return; }
+    if (centralDay() > DAYS) { statusEl.textContent = ""; return; }
     var next = latest + 1;
-    var at = openAt(next);
-    var ms = at - now;
-    statusEl.textContent = "";
-    if (ms <= 0) {
-      statusEl.appendChild(document.createTextNode("Door " + next + " is being poured. Check back in a few minutes."));
-      return;
-    }
-    var lead = next === 1 ? "First door opens in " : "Door " + next + " opens in ";
-    statusEl.appendChild(document.createTextNode(lead));
-    var b = document.createElement("strong");
-    b.textContent = countdown(ms);
-    statusEl.appendChild(b);
-    statusEl.appendChild(document.createTextNode(" (" + localTime(at) + " your time, 5:00 pm Central)"));
+    var ms = openAt(next).getTime() - nowMs();
+    if (ms <= 0) { statusEl.textContent = "Door " + next + " is due. Updating, check back in a few minutes."; return; }
+    var at = next === 1 ? "Nov 30" : "Dec " + (next - 1);
+    statusEl.textContent = "Door " + next + " opens in " + countdown(ms) + " (" + at + ", 5:00 pm Central).";
   }
 
-  function render() { renderHero(); renderGrid(); renderStatus(); }
+  var lastDay = null;
+  function render() { lastDay = centralDay(); renderHero(); renderGrid(); renderStatus(); }
 
   function load() {
     var url = "revealed.json?t=" + Date.now();
@@ -358,16 +339,19 @@
       .then(function (data) {
         var next = {};
         var max = 0;
+        var n = 0;
         var days = (data && Array.isArray(data.days)) ? data.days : [];
         days.forEach(function (d) {
-          var n = Number(d && d.day);
-          if (n >= 1 && n <= DAYS && typeof d.beer === "string" && d.beer) {
-            next[n] = d.beer;
-            if (n > max) max = n;
+          var k = Number(d && d.day);
+          if (k >= 1 && k <= DAYS && typeof d.beer === "string" && d.beer) {
+            if (!next[k]) n++;
+            next[k] = d.beer;
+            if (k > max) max = k;
           }
         });
         revealed = next;
         latest = max;
+        count = n;
         loaded = true;
         failed = false;
         render();
@@ -378,12 +362,12 @@
       });
   }
 
-  // Tick the countdown; refetch when a door's time passes and while waiting on the publish.
+  // Update the countdown; refetch every minute once the next door is due, or after a failure.
   var lastFetch = 0;
   setInterval(function () {
-    renderStatus();
+    if (centralDay() !== lastDay) render(); else renderStatus();
+    var waiting = loaded && latest < DAYS && nowMs() >= openAt(latest + 1).getTime();
     var now = Date.now();
-    var waiting = loaded && latest < DAYS && now >= openAt(latest + 1).getTime();
     if ((waiting || (failed && !loaded)) && now - lastFetch > 60000) { lastFetch = now; load(); }
   }, 1000);
   document.addEventListener("visibilitychange", function () {

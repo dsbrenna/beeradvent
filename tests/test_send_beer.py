@@ -103,7 +103,7 @@ class RunTests(unittest.TestCase):
 
     @mock.patch("send_beer.urllib.request.urlopen")
     def test_out_of_range_dates_noop(self, urlopen):
-        for d in ("2026-11-30", "2026-12-25", "2026-12-31", "2027-01-01", "2026-07-04"):
+        for d in ("2026-11-29", "2026-12-24", "2026-12-25", "2026-12-31", "2027-01-01", "2026-07-04"):
             code, out, _ = self.run_main("--date", d)
             self.assertEqual(code, 0)
             self.assertIn("nothing to send", out)
@@ -111,24 +111,25 @@ class RunTests(unittest.TestCase):
 
     @mock.patch("send_beer.urllib.request.urlopen")
     def test_dry_run_prints_right_beer_no_network(self, urlopen):
-        expected = send_beer.beer_for_day(BEERS, 5, 2026)
+        # The Dec 5 run announces the Dec 6 beer, one day ahead.
+        expected = send_beer.beer_for_day(BEERS, 6, 2026)
         code, out, _ = self.run_main("--date", "2026-12-05", "--dry-run")
         self.assertEqual(code, 0)
-        self.assertIn(f"Today's beer: {expected}", out)
-        self.assertIn("Beer Advent Day 5", out)
+        self.assertIn(f"Tomorrow's beer (Dec 6): {expected}", out)
+        self.assertIn("Beer Advent Day 6", out)
         urlopen.assert_not_called()
 
     @mock.patch("send_beer.urllib.request.urlopen")
     def test_send_builds_right_request(self, urlopen):
         urlopen.return_value.__enter__.return_value.status = 200
         expected = send_beer.beer_for_day(BEERS, 1, 2026)
-        code, _, _ = self.run_main("--date", "2026-12-01")
+        code, _, _ = self.run_main("--date", "2026-11-30")
         self.assertEqual(code, 0)
         urlopen.assert_called_once()
         req = urlopen.call_args.args[0]
         self.assertEqual(req.full_url, "https://ntfy.sh/test-topic")
         self.assertEqual(req.get_method(), "POST")
-        self.assertEqual(req.data, f"Today's beer: {expected}".encode("utf-8"))
+        self.assertEqual(req.data, f"Tomorrow's beer (Dec 1): {expected}".encode("utf-8"))
         self.assertEqual(req.get_header("Title"), "Beer Advent Day 1")
         self.assertEqual(req.get_header("Tags"), "beer")
         self.assertEqual(urlopen.call_args.kwargs["timeout"], send_beer.TIMEOUT)
@@ -140,11 +141,11 @@ class RunTests(unittest.TestCase):
         perm = send_beer.permutation(2026)
         beers[perm[0]] = "Weihenstephaner Hefeweißbier \U0001F37A"
         Path(self.path).write_text("\n".join(beers), encoding="utf-8")
-        code, _, _ = self.run_main("--date", "2026-12-01")
+        code, _, _ = self.run_main("--date", "2026-11-30")
         self.assertEqual(code, 0)
         req = urlopen.call_args.args[0]
         self.assertEqual(req.data.decode("utf-8"),
-                         "Today's beer: Weihenstephaner Hefeweißbier \U0001F37A")
+                         "Tomorrow's beer (Dec 1): Weihenstephaner Hefeweißbier \U0001F37A")
         req.get_header("Title").encode("latin-1")
 
     @mock.patch("send_beer.urllib.request.urlopen")
